@@ -8,8 +8,6 @@ from notify import Notify
 
 # Fetching env vars
 chromedriver_path = os.environ.get('CHROMEDRIVER_PATH')
-server_ip_deemed = '45.116.207.203'
-server_ip_hill = '45.116.207.79'
 
 chrome_options = Options()
 chrome_options.binary_location = os.environ.get(
@@ -32,11 +30,17 @@ class Bot:
         self.marked_count = 0
         self.server_ip = ''
 
-    def login(self, username, password, clg):
+    def login(self, student):
         bot = self.bot
         logger = self.logger
 
-        self.server_ip = server_ip_hill if clg == 'hill' else server_ip_deemed
+        username = student['Id']
+        password = student['Password']
+        name = student['Name']
+        clg = student['Clg']
+        clg_ip = student['Clg_ip']
+
+        self.server_ip = clg_ip
         server_ip = self.server_ip
 
         logger.info('Opening Moodle')
@@ -51,7 +55,7 @@ class Bot:
         username_field.send_keys(username)
         password_field.send_keys(password)
 
-        logger.info('Logging in {}'.format(username))
+        logger.info('Logging in {}({})'.format(name, username))
         password_field.send_keys(Keys.RETURN)
         bot.implicitly_wait(5)
 

@@ -30,15 +30,29 @@ def scheduled_job():
 
     for student in students:
 
-        # Login
-        bot.login(student['Id'], student['Password'], student['Clg'])
+        try:
+            # Login
+            bot.login(student)
+        except:
+            logger.error('An error occured while trying to login. Skipping...')
+            continue
 
-        # Mark Attendance
-        bot.mark_attendance()
+        try:
+            # Mark Attendance
+            bot.mark_attendance()
+        except:
+            logger.error(
+                'An error occured while trying to mark attendance. Skipping...')
+            continue
 
         # Notify
-        logger.info('Done for {}'.format(student['Id']))
-        bot.notify_stud(contact=student['Contact'])
+        logger.info('Done for {}({})\n'.format(student['Name'], student['Id']))
+        try:
+            bot.notify_stud(contact=student['Contact'])
+        except KeyError:
+            logger.error('No contact found to notify person. Skipping...')
+        except:
+            logger.error('An error occured notifying user')
 
     # Terminate after marking all attendance
     bot.close_window()
